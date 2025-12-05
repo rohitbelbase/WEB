@@ -1,0 +1,4 @@
+git clone <your-fork-url>
+cd <project-folder>
+npm install
+npm run dev

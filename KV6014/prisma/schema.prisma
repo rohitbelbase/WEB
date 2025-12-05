@@ -1,0 +1,57 @@
+// prisma/schema.prisma
+// SQLite database with User + Skill + UserSkill join table.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Verification
+  verified            Boolean   @default(false)
+
+  // Login lockout
+  failedLoginAttempts Int       @default(0)
+  lockoutUntil        DateTime?
+
+  // Profile fields
+  bio                String?
+  age                Int?
+  address            String?
+  availableMorning   Boolean   @default(false)
+  availableAfternoon Boolean   @default(false)
+  availableEvening   Boolean   @default(false)
+  avatarUrl          String?
+
+  // Skills relation
+  skills UserSkill[]
+}
+
+model Skill {
+  id        String      @id @default(cuid())
+  name      String      @unique
+  createdAt DateTime    @default(now())
+  users     UserSkill[]
+}
+
+model UserSkill {
+  userId    String
+  skillId   String
+  createdAt DateTime    @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  skill Skill @relation(fields: [skillId], references: [id])
+
+  @@id([userId, skillId])
+}

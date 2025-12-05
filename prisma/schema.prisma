@@ -7,36 +7,37 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum VerificationStatus {
-  UNVERIFIED
-  PENDING
-  VERIFIED
-}
-
 model User {
-  id                   Int                   @id @default(autoincrement())
-  email                String                @unique
-  name                 String?
-  passwordHash         String
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String?
+  passwordHash String
 
-  verificationStatus   VerificationStatus    @default(UNVERIFIED)
-  verificationNote     String?
-  verifiedAt           DateTime?
+  verificationStatus String @default("UNVERIFIED")
 
   verificationRequests VerificationRequest[]
 
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
+  // >>> Geolocation fields added <<<
+  latitude     Float?
+  longitude    Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model VerificationRequest {
-  id        Int                @id @default(autoincrement())
-  user      User               @relation(fields: [userId], references: [id])
-  userId    Int
-  status    VerificationStatus @default(PENDING)
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+
+  method      String
+  documentUrl String?
+  phoneNumber String?
+
+  status    String   @default("PENDING")
   note      String?
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([status])
